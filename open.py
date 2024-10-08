@@ -28,6 +28,24 @@ def load_data(filename):
             )
     return products
 
+def save_data(filename, list):
+    with open(filename, 'w', newline='') as file:
+        fields = ["id", "name", "desc", "price", "quantity"]
+        rows = []
+        for i in range(len(list)):
+            append_row = []
+            append_row.append(list[i]['id'])
+            append_row.append(list[i]['name'])
+            append_row.append(list[i]['desc'])
+            append_row.append(list[i]['price'])
+            append_row.append(list[i]['quantity'])
+            rows.append(append_row)
+        write = csv.writer(file)  
+        write.writerow(fields)
+        write.writerows(rows)
+
+
+
 #gör en funktion som hämtar en produkt
 
     
@@ -84,7 +102,27 @@ def add_product(name,desc,price,quantity):
             )
 
 def edit(products, identification):
-    pass
+    inputt = input("""Vad vill du ändra
+(N)amn
+(B)eskrivining
+(P)ris
+(A)ntal\n""").strip().upper()
+    if inputt in ["N", "B", "P", "A"]:
+        if inputt == "N":
+            new_name = input("Nya namnet: ")
+            selected_product["name"] = new_name
+        elif inputt == "B":
+            new_desc = input("Nya beskrivningen: ")
+            selected_product["desc"] = new_desc
+        elif inputt == "P":
+            new_price = input("Nya priset: ")
+            selected_product["price"] = new_price
+        elif inputt == "A":
+            new_quantity = input("Nya antalet: ")
+            selected_product["quantity"] = new_quantity
+    else:
+        print("Välj något i listan")
+        sleep(0.3)
 
 def view_inventory(products):
     # skapa sidhuvudet av tabellen:
@@ -123,10 +161,11 @@ while True:
         choice = input("""(V)isa produkt
 (T)a bort en produkt
 (L)ägga till en produkt
-(Ä)ndra produkt\n""").strip().upper()
+(Ä)ndra produkt
+(S)para listan\n""").strip().upper()
 
 
-        if choice in ["V", "T", "Ä"]:
+        if choice in ["V", "L", "T", "Ä"]:
             index = int(input("Enter product ID: "))
             
             if choice == "V":   #visa
@@ -151,40 +190,26 @@ while True:
                 else:
                     print("Ogiltig produkt")
                     sleep(0.3)
+            
             elif choice == "Ä": #ändra
                 if 1 <= index <= len(products):  # Ensure the index is within the valid range
                     selected_product = products[index - 1]
                     identification = selected_product["id"]
-                    inputt = input("""Vad vill du ändra
-(N)amn
-(B)eskrivining
-(P)ris
-(A)ntal\n""").strip().upper()
-                    if inputt in ["N", "B", "P", "A"]:
-                        if inputt == "N":
-                            new_name = input("Nya namnet: ")
-                            selected_product["name"] = new_name
-                        elif inputt == "B":
-                            new_desc = input("Nya beskrivningen: ")
-                            selected_product["desc"] = new_desc
-                        elif inputt == "P":
-                            new_price = input("Nya priset: ")
-                            selected_product["price"] = new_price
-                        elif inputt == "A":
-                            new_quantity = input("Nya antalet: ")
-                            selected_product["quantity"] = new_quantity
-                    else:
-                        print("Välj något i listan")
-                        sleep(0.3)
+                    edit(products, identification)
                 else:
                     print("Ogiltig produkt")
                     sleep(0.3)
-        elif choice == "L":
-                name = input("Namn: ")
-                desc = input("Beskrivning: ")
-                price = float(input("Pris: "))
-                quantity = int(input("Antal: "))
-                add_product(name,desc,price,quantity)
+
+            elif choice == "L":
+                    name = input("Namn: ")
+                    desc = input("Beskrivning: ")
+                    price = float(input("Pris: "))
+                    quantity = int(input("Antal: "))
+                    add_product(name,desc,price,quantity)
+
+        elif choice == "S":
+            save_data('db_products.csv', products)
+
     except ValueError:
         print("Välj en produkt med siffor")
         sleep(0.5)
