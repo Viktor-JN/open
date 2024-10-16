@@ -29,21 +29,10 @@ def load_data(filename):
     return products
 
 def save_data(filename, list):
-    with open(filename, 'w', newline='') as file:
-        fields = ["id", "name", "desc", "price", "quantity"]
-        rows = []
-        for i in range(len(list)):
-            append_row = []
-            append_row.append(list[i]['id'])
-            append_row.append(list[i]['name'])
-            append_row.append(list[i]['desc'])
-            append_row.append(list[i]['price'])
-            append_row.append(list[i]['quantity'])
-            rows.append(append_row)
-        write = csv.writer(file)  
-        write.writerow(fields)
-        write.writerows(rows)
-
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=["id", "name", "desc", "price", "quantity"])
+        writer.writeheader()  # Write the header row
+        writer.writerows(list)  # Write the product data
 
 
 #gör en funktion som hämtar en produkt
@@ -165,7 +154,7 @@ while True:
 (S)para listan\n""").strip().upper()
 
 
-        if choice in ["V", "L", "T", "Ä"]:
+        if choice in ["V", "T", "L", "Ä"]:
             index = int(input("Enter product ID: "))
             
             if choice == "V":   #visa
