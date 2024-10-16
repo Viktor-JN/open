@@ -1,8 +1,8 @@
 import csv
 import os
 import locale
+import shutil
 from time import sleep
-from msvcrt import getwch
 
 
 def load_data(filename): 
@@ -29,10 +29,18 @@ def load_data(filename):
     return products
 
 def save_data(filename, list):
-    with open(filename, mode='w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=["id", "name", "desc", "price", "quantity"])
-        writer.writeheader()  # Write the header row
-        writer.writerows(list)  # Write the product data
+    with open("temp_backup.csv", 'w'):
+        shutil.copyfile(f'{filename}', 'temp_backup.csv')
+    try:
+        with open(filename, mode='w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=["id", "name", "desc", "price", "quantity"])
+            writer.writeheader()  # Write the header row
+            writer.writerows(list)  # Write the product data
+        return f"Produktlistan sparad i {filename}"
+    except:
+        print("Listan sparades inte korrekt, vänligen kolla i temp_backup.csv för en backup av filen innan den sparades")
+        sleep(4)
+    
 
 
 #gör en funktion som hämtar en produkt
@@ -68,7 +76,7 @@ def view_product(products, id):
 def view_products(products):
     product_list = []
     for index, product in enumerate(products,1 ):
-        product_info = f"{index}) (#{product['id']}) {product['name']} \t {product['desc']} \t {locale.currency(product['price'], grouping=True)}"
+        product_info = f"{index}) (#{product['id']}) {product['name']}, \t {product['desc']}, \t {locale.currency(product['price'], grouping=True)}, {product['quantity']}"
         product_list.append(product_info)
     
     return "\n".join(product_list)
@@ -105,10 +113,10 @@ def edit(products, identification):
             selected_product["desc"] = new_desc
         elif inputt == "P":
             new_price = input("Nya priset: ")
-            selected_product["price"] = new_price
+            selected_product["price"] = float(new_price)
         elif inputt == "A":
             new_quantity = input("Nya antalet: ")
-            selected_product["quantity"] = new_quantity
+            selected_product["quantity"] = int(new_quantity)
     else:
         print("Välj något i listan")
         sleep(0.3)
@@ -143,7 +151,7 @@ os.system('cls' if os.name == 'nt' else 'clear')
 products = load_data('db_products.csv')
 while True:
     try:
-        os.system('cls' if os.name == 'nt' else 'clear')
+        # os.system('cls' if os.name == 'nt' else 'clear')
 
         print(view_products(products))  # Show ordered list of products
 
@@ -197,7 +205,7 @@ while True:
                     add_product(name,desc,price,quantity)
 
         elif choice == "S":
-            save_data('db_products.csv', products)
+            print(save_data('db_products.csv', products))
 
     except ValueError:
         print("Välj en produkt med siffor")
